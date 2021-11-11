@@ -2,12 +2,28 @@ import os
 from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
+from dotenv import load_dotenv
+load_dotenv()
+SECRET_KEY = os.urandom(32)
+# Grabs the folder where the script runs.
+basedir = os.path.abspath(os.path.dirname(__file__))
 
-database_name = "trivia"
+
+DB_HOST = os.getenv("DB_HOST")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_DEV = os.getenv("DB_DEV")
+
+# database_name = "trivia"
 # database_path = "postgres://{}/{}".format('localhost:5432', database_name)
+# database_path = "postgresql://{}:{}@{}/{}".format(
+#     "postgres", "postgres", "localhost:5432", database_name
+# )
 database_path = "postgresql://{}:{}@{}/{}".format(
-    "postgres", "postgres", "localhost:5432", database_name
+    DB_USER, DB_PASSWORD, DB_HOST, DB_DEV
 )
+
+
 
 db = SQLAlchemy()
 

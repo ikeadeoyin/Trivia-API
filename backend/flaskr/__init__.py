@@ -204,7 +204,7 @@ def create_app(test_config=None):
   def search_questions():
        body = request.get_json()
 
-       search = body.get("search", None)
+       search = body.get("searchTerm", None)
        selection = Question.query.order_by(Question.id).filter(
                     Question.question.ilike("%{}%".format(search)))
        current_questions = paginate_questions(request, selection)
@@ -314,12 +314,29 @@ def create_app(test_config=None):
             "message": "Not found"
             }), 404
 
-  @app.errorhandler(422)
-  def unprocessable(error):
+  @app.errorhandler(400)
+  def bad_request(error):
         return jsonify({
             "success": False, 
+            "error": 400,
+            "message": "bad request"
+            }), 400
+
+  app.errorhandler(500)
+  def not_found(error):
+    return jsonify({
+            "success": False, 
+            "error": 500,
+            "message": "Internal server error"
+            }), 500
+
+
+  @app.errorhandler(422)
+  def unproccesable(error):
+    return jsonify({
+            "success": False, 
             "error": 422,
-            "message": "unprocessable"
+            "message": "unproccessable"
             }), 422
   
   return app
