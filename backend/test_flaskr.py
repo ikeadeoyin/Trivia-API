@@ -37,6 +37,31 @@ class TriviaTestCase(unittest.TestCase):
         )
         setup_db(self.app, self.database_path)
 
+        self.good_question = {
+            "question":"How many months are in a year?",
+            "answer": "12",
+            "category": "2",
+            "difficulty": "1"
+        }
+
+        self.bad_question = {
+            "question":"How many months are in a year?",
+            "answer": "12",
+            "category": "two",
+            "difficulty": "1"
+        }
+
+        self.good_quiz = {
+            "previous_questions":"5",
+            "quiz_category": "2"
+        }
+
+        self.bad_quiz = {
+            "previous_questions":"How many months are in a year?",
+            "quiz_category": "2"
+        }
+
+
 
         # binds the app to the current context
         with self.app.app_context():
@@ -88,10 +113,25 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Not found")
 
+    def test_add_questions(self):
+        
+        res = self.client().post('/questions', json=self.good_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_add_questions_failure(self):
+        
+        res = self.client().post('/questions', json=self.bad_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
 
 
     def test_delete_question(self):
-        res = self.client().delete("/questions/14")
+        res = self.client().delete("/questions/16")
         data = json.loads(res.data)
 
         question = Question.query.filter(Question.id == 1).one_or_none()
@@ -148,6 +188,15 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
+
+    def test_play_quiz_failure(self):
+        
+        res = self.client().post('/question', json=self.bad_quiz)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
     
     
     
